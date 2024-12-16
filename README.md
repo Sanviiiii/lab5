@@ -1,5 +1,10 @@
 # lab5
 android:background="@drawable/bg"
+
+
+<uses-permission android:name="android.permission.SET_WALLPAPER"/>
+
+
 Chat gpt code for wall paper
 
 
