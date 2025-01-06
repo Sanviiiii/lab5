@@ -296,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
         bmulti = findViewById(R.id.btn_multi);
         bdiv = findViewById(R.id.btn_divide);
         beql = findViewById(R.id.btn_eql);
-        ET_Result = findViewById(R.id.ET_result);
+        ET_Result = findViewById(R.id.ET_Result);
 
         // Number buttons
         View.OnClickListener numberClickListener = view -> {
