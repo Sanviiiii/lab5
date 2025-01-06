@@ -1,4 +1,5 @@
 xml
+
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -63,58 +64,75 @@ xml
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 
+
+
+
+
 java
 
 
-package com.example.counter
-
-import android.os.Bundle
-import android.os.Handler
-import android.os.Message
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-
-class MainActivity : AppCompatActivity() {
-    var ctr: TextView? = null
-    var start: Button? = null
-    var stop: Button? = null
-    var counter: Int = 0
-    var running: Boolean = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        this.enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        start = findViewById<View>(R.id.btn_start) as Button
-        stop = findViewById<View>(R.id.btn_stop) as Button
-        ctr = findViewById<View>(R.id.counter) as TextView
-        start!!.setOnClickListener {
-            counter = 0
-            running = true
-            MyCounter().start()
-        }
-        stop!!.setOnClickListener { running = false }
+package com.example.counter;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+public class MainActivity extends AppCompatActivity {
+    TextView ctr;
+    Button start, stop;
+    int counter=0;
+    boolean running=false;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        start=(Button)findViewById(R.id.btn_start);
+        stop=(Button)findViewById(R.id.btn_stop);
+        ctr=(TextView)findViewById(R.id.counter);
+        start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                counter=0;
+                running=true;
+                new MyCounter().start();
+            }
+        });
+        stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                running=false;
+            }
+        });
     }
-
-    var handler: Handler = object : Handler() {
-        override fun handleMessage(m: Message) {
-            ctr!!.text = m.what.toString()
+    Handler handler=new Handler()
+    {
+        public void handleMessage(Message m)
+        {
+            ctr.setText(String.valueOf(m.what));
         }
-    }
-
-    internal inner class MyCounter : Thread() {
-        override fun run() {
-            while (running) {
-                counter++
-                handler.sendEmptyMessage(counter)
+    };
+    class MyCounter extends Thread
+    {
+        public void run()
+        {
+            while(running)
+            {
+                counter++;
+                handler.sendEmptyMessage(counter);
                 try {
-                    sleep(1000)
-                } catch (e: Exception) {
+                    Thread.sleep(1000);
                 }
+
+                catch (Exception e)
+                { }
             }
         }
     }
 }
+
+
+
