@@ -1,0 +1,203 @@
+xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="251dp"
+        android:layout_height="89dp"
+        android:text="COUNTER"
+        android:textAlignment="center"
+        android:textColor="#3F51B5"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.066" />
+
+    <TextView
+        android:id="@+id/counter"
+        android:layout_width="151dp"
+        android:layout_height="45dp"
+        android:textAlignment="center"
+        android:textAllCaps="true"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.247" />
+
+    <Button
+        android:id="@+id/btn_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="start"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.426" />
+
+    <Button
+        android:id="@+id/btn_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="stop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.565" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+java
+
+
+package com.example.calculator;
+
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+    Button b1, b2, b3, b4, b5, b6, b7, b8, b9, b0, bdot, bcl, bplus, bminus, bmulti, bdiv, beql;
+    EditText ET_Result;
+    Float v1, v2;
+    Boolean add = false, sub = false, multi = false, div = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Initialize Buttons and EditText
+        b1 = findViewById(R.id.btn_one);
+        b2 = findViewById(R.id.btn_two);
+        b3 = findViewById(R.id.btn_three);
+        b4 = findViewById(R.id.btn_four);
+        b5 = findViewById(R.id.btn_five);
+        b6 = findViewById(R.id.btn_six);
+        b7 = findViewById(R.id.btn_seven);
+        b8 = findViewById(R.id.btn_eight);
+        b9 = findViewById(R.id.btn_nine);
+        b0 = findViewById(R.id.btn_zero);
+        bdot = findViewById(R.id.btn_dot);
+        bcl = findViewById(R.id.btn_clear);
+        bplus = findViewById(R.id.btn_plus);
+        bminus = findViewById(R.id.btn_minus);
+        bmulti = findViewById(R.id.btn_multi);
+        bdiv = findViewById(R.id.btn_divide);
+        beql = findViewById(R.id.btn_eql);
+        ET_Result = findViewById(R.id.ET_result);
+
+        // Number buttons
+        View.OnClickListener numberClickListener = view -> {
+            Button btn = (Button) view;
+            ET_Result.setText(ET_Result.getText().toString() + btn.getText());
+        };
+
+        b1.setOnClickListener(numberClickListener);
+        b2.setOnClickListener(numberClickListener);
+        b3.setOnClickListener(numberClickListener);
+        b4.setOnClickListener(numberClickListener);
+        b5.setOnClickListener(numberClickListener);
+        b6.setOnClickListener(numberClickListener);
+        b7.setOnClickListener(numberClickListener);
+        b8.setOnClickListener(numberClickListener);
+        b9.setOnClickListener(numberClickListener);
+        b0.setOnClickListener(numberClickListener);
+
+        // Dot button (only one dot allowed)
+        bdot.setOnClickListener(view -> {
+            if (!ET_Result.getText().toString().contains(".")) {
+                ET_Result.setText(ET_Result.getText().toString() + ".");
+            }
+        });
+
+        // Clear button
+        bcl.setOnClickListener(view -> ET_Result.setText(""));
+
+        // Arithmetic operation buttons
+        bplus.setOnClickListener(view -> {
+            if (!ET_Result.getText().toString().isEmpty()) {
+                v1 = Float.parseFloat(ET_Result.getText().toString());
+                add = true;
+                ET_Result.setText("");
+            } else {
+                ET_Result.setError("Enter a number first");
+            }
+        });
+
+        bminus.setOnClickListener(view -> {
+            if (!ET_Result.getText().toString().isEmpty()) {
+                v1 = Float.parseFloat(ET_Result.getText().toString());
+                sub = true;
+                ET_Result.setText("");
+            } else {
+                ET_Result.setError("Enter a number first");
+            }
+        });
+
+        bmulti.setOnClickListener(view -> {
+            if (!ET_Result.getText().toString().isEmpty()) {
+                v1 = Float.parseFloat(ET_Result.getText().toString());
+                multi = true;
+                ET_Result.setText("");
+            } else {
+                ET_Result.setError("Enter a number first");
+            }
+        });
+
+        bdiv.setOnClickListener(view -> {
+            if (!ET_Result.getText().toString().isEmpty()) {
+                v1 = Float.parseFloat(ET_Result.getText().toString());
+                div = true;
+                ET_Result.setText("");
+            } else {
+                ET_Result.setError("Enter a number first");
+            }
+        });
+
+        // Equals button
+        beql.setOnClickListener(view -> {
+            if (!ET_Result.getText().toString().isEmpty()) {
+                v2 = Float.parseFloat(ET_Result.getText().toString());
+                if (add) {
+                    ET_Result.setText(String.valueOf(v1 + v2));
+                    add = false;
+                } else if (sub) {
+                    ET_Result.setText(String.valueOf(v1 - v2));
+                    sub = false;
+                } else if (multi) {
+                    ET_Result.setText(String.valueOf(v1 * v2));
+                    multi = false;
+                } else if (div) {
+                    if (v2 != 0) {
+                        ET_Result.setText(String.valueOf(v1 / v2));
+                    } else {
+                        ET_Result.setText("Error: Division by 0");
+                    }
+                    div = false;
+                }
+            } else {
+                ET_Result.setError("Enter a number first");
+            }
+        });
+    }
+}
