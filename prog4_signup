@@ -1,5 +1,7 @@
 Activity_Main.XML
-<?xml version="1.0" encoding="utf-8"?>
+
+
+  <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -63,7 +65,9 @@ Activity_Main.XML
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
+
 Activity_Signin.XML
+
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -127,6 +131,10 @@ Activity_Signin.XML
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
+      
+       
+        
+
 Activity_Welcome.XML
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -157,7 +165,9 @@ Activity_Welcome.XML
 
 
 
+
 Signup.JAVA
+
 package com.example.signup;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -207,25 +217,27 @@ public class Signup extends AppCompatActivity {
 
     private boolean isvalidPassword(String userpwd) {
         if (userpwd.length() < 8) {
-         return false;
+            return false;
         }
-       if(!lowercase.matcher(userpwd).matches()){
-           return false;
-       }
-       if(!uppercase.matcher(userpwd).matches()){
-           return false;
-       }
-       if(!number.matcher(userpwd).matches()){
-           return false;
-       }
-       if(!special.matcher(userpwd).matches()){
-           return false;
-       }
+        if(!lowercase.matcher(userpwd).matches()){
+            return false;
+        }
+        if(!uppercase.matcher(userpwd).matches()){
+            return false;
+        }
+        if(!number.matcher(userpwd).matches()){
+            return false;
+        }
+        if(!special.matcher(userpwd).matches()){
+            return false;
+        }
         return true;
     }
 }
+
 Signin.JAVA
 package com.example.signup;
+
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
@@ -235,45 +247,54 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class Signin extends AppCompatActivity {
-   EditText eusername, epwd;
+    EditText eusername, epwd;
     Button login;
-    int count=0;
+    int count = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_signin);
-        eusername = (EditText) findViewById(R.id.username);
-        epwd = (EditText)findViewById(R.id.password);
-        login = (Button)findViewById(R.id.login);
-        String regemail=getIntent().getStringExtra("email");
-        String regpwd=getIntent().getStringExtra("userpwd");
+        setContentView(R.layout.activity_main2);
+
+        // Initialize views
+        eusername = findViewById(R.id.username);
+        epwd = findViewById(R.id.password);
+        login = findViewById(R.id.login);
+
+        // Retrieve the registered email and password from Intent
+        String regemail = getIntent().getStringExtra("email");
+        String regpwd = getIntent().getStringExtra("userpwd");
+
+        // Set onClickListener for the login button
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String newemail=eusername.getText().toString();
-                String newpwd=epwd.getText().toString();
-                if(regemail.equals(newemail) && regpwd.equals(newpwd)){
+                String newemail = eusername.getText().toString();
+                String newpwd = epwd.getText().toString();
+
+                // Check if the entered email and password match the registered ones
+                if (regemail.equals(newemail) && regpwd.equals(newpwd)) {
+                    // Login successful
                     Toast.makeText(Signin.this, "Login Successful", Toast.LENGTH_LONG).show();
-                    Intent intent=new Intent(Signin.this,Welcome.class);
+                    Intent intent = new Intent(Signin.this, Welcome.class);
                     startActivity(intent);
-                    eusername.setText("");
-                    epwd.setText("");
-                }
-                else{
+                    eusername.setText(""); // Clear username field
+                    epwd.setText(""); // Clear password field
+                } else {
+                    // Login failed
                     count++;
-                    Toast.makeText(Signin.this, "Login Failed "+count, Toast.LENGTH_LONG).show();
-                    if(count==3)
-                    {
+                    Toast.makeText(Signin.this, "Login Failed: Attempt " + count, Toast.LENGTH_LONG).show();
+
+                    // Disable login button after 3 failed attempts
+                    if (count == 3) {
                         login.setEnabled(false);
-                        Toast.makeText(Signin.this, "Login Failed "+count, Toast.LENGTH_LONG).show();
+                        Toast.makeText(Signin.this, "Account Locked After 3 Failed Attempts", Toast.LENGTH_LONG).show();
                     }
                 }
-             }); 
+            }
+        });
+    }
 }
-}
-
-
-
 
 
 
@@ -292,6 +313,9 @@ public class Welcome extends AppCompatActivity {
         setContentView(R.layout.activity_welcome);
     }
 }
+
+
+
 
 
 
