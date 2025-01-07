@@ -152,6 +152,7 @@ Activity_main.xml
 </LinearLayout>
 
 
+
 Project Tab->res->values->String.xml (Spinner values)
 <resources>
     <string name="app_name">MedicineReminder</string>
@@ -164,7 +165,7 @@ Project Tab->res->values->String.xml (Spinner values)
 </resources>
 
 Mainactivity.java
-package com.example.medicinereminder;
+package com.example.med;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -175,141 +176,157 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.activity.EdgeToEdge;
+
 import androidx.appcompat.app.AppCompatActivity;
 
-
 public class MainActivity extends AppCompatActivity {
-    EditText medname,meddate;
-    Button insert,fetch;
+    // Declare UI elements
+    EditText medname, meddate;
+    Button insert, fetch;
     Spinner day;
     Switch switch1;
     TextView medtxt;
-    DatabaseConnection dbconnection;
+    DataBaseConn dbconnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        medname=(EditText)findViewById(R.id.medicinename);
-        meddate=(EditText)findViewById(R.id.date);
-        insert=(Button)findViewById(R.id.insert);
-        fetch=(Button)findViewById(R.id.fetch);
-        day=(Spinner)findViewById(R.id.spinner);
-        switch1=(Switch)findViewById(R.id.switch1);
-        medtxt=(TextView)findViewById(R.id.medtext);
-        dbconnection=new DatabaseConnection(this);
 
+        // Initialize UI elements
+        medname = findViewById(R.id.medicinename);
+        meddate = findViewById(R.id.date);
+        insert = findViewById(R.id.insert);
+        fetch = findViewById(R.id.fetch);
+        day = findViewById(R.id.spinner);
+        switch1 = findViewById(R.id.switch1);
+        medtxt = findViewById(R.id.medtext);
+
+        // Initialize database connection
+        dbconnection = new DataBaseConn(this);
+
+        // Hide the fetch button initially
         fetch.setVisibility(View.INVISIBLE);
+
+        // Set up switch listener to toggle between insert and fetch UI
         switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(!b)
-                {
-                    fetch.setVisibility(View.INVISIBLE);
-                    insert.setVisibility(View.VISIBLE);
-                    medname.setVisibility(View.VISIBLE);
-                    medtxt.setVisibility(View.VISIBLE);
-                }
-                else{
-                    fetch.setVisibility(View.VISIBLE);
-                    insert.setVisibility(View.INVISIBLE);
-                    medname.setVisibility(View.INVISIBLE);
-                    medtxt.setVisibility(View.INVISIBLE);
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (!isChecked) {  // If switch is OFF
+                    fetch.setVisibility(View.INVISIBLE);  // Hide fetch button
+                    insert.setVisibility(View.VISIBLE);   // Show insert button
+                    medname.setVisibility(View.VISIBLE);  // Show medicine name input
+                    medtxt.setVisibility(View.VISIBLE);   // Show medicine name label
+                } else {  // If switch is ON
+                    fetch.setVisibility(View.VISIBLE);   // Show fetch button
+                    insert.setVisibility(View.INVISIBLE); // Hide insert button
+                    medname.setVisibility(View.INVISIBLE); // Hide medicine name input
+                    medtxt.setVisibility(View.INVISIBLE);  // Hide medicine name label
                 }
             }
         });
 
-
+        // Set up insert button click listener
         insert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String name=medname.getText().toString();
-                String date=meddate.getText().toString();
-                String time=day.getSelectedItem().toString();
-                boolean insert=dbconnection.insertvalues(name,date,time);
-                if(insert==true)
-                {
+                String name = medname.getText().toString();
+                String date = meddate.getText().toString();
+                String time = day.getSelectedItem().toString();
+
+                // Insert data into database
+                boolean isInserted = dbconnection.insertValues(name, date, time);
+                if (isInserted) {
                     Toast.makeText(getApplicationContext(), "Data Inserted", Toast.LENGTH_LONG).show();
-                    medname.setText(" ");
-                    meddate.setText(" ");
-                }
-                else {
+                    medname.setText("");  // Clear input
+                    meddate.setText("");  // Clear input
+                } else {
                     Toast.makeText(getApplicationContext(), "Data Not Inserted", Toast.LENGTH_LONG).show();
                 }
             }
         });
 
+        // Set up fetch button click listener
         fetch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String date=meddate.getText().toString();
-                String time=day.getSelectedItem().toString();
-                String med="";
-                Cursor c=dbconnection.FetchData(date,time);
-                if(c.moveToFirst()) {
+                String date = meddate.getText().toString();
+                String time = day.getSelectedItem().toString();
+
+                // Fetch data from database based on selected date and time
+                Cursor cursor = dbconnection.fetchData(date, time);
+                String medNames = "";
+                if (cursor.moveToFirst()) {
                     do {
-                        med += (String.valueOf(c.getString(c.getColumnIndexOrThrow("MedicineName"))));
-                        med += "\n";
-                    } while (c.moveToNext());
-                    Toast.makeText(getApplicationContext(), med, Toast.LENGTH_LONG).show();
-                }
-                else
+                        medNames += cursor.getString(cursor.getColumnIndexOrThrow("MedicineName")) + "\n";
+                    } while (cursor.moveToNext());
+
+                    // Display fetched medicine names in a Toast
+                    Toast.makeText(getApplicationContext(), medNames, Toast.LENGTH_LONG).show();
+                } else {
                     Toast.makeText(getApplicationContext(), "No Entries in Database", Toast.LENGTH_SHORT).show();
+                }
             }
         });
-
     }
-
-
 }
 
+
+
 DatabaseConnection.java
-package com.example.medicinereminder;
+package com.example.med;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import androidx.annotation.Nullable;
 
-public class DatabaseConnection extends SQLiteOpenHelper {
-    public DatabaseConnection(Context context) {
+public class DataBaseConn extends SQLiteOpenHelper {
+
+    public DataBaseConn(Context context) {
         super(context, "Medicinedb", null, 1);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("create Table MDTable(MedicineName Text,date TEXT,time TEXT)");
+        // Creating table with appropriate columns
+        sqLiteDatabase.execSQL("CREATE TABLE MDTable(MedicineName TEXT, date TEXT, time TEXT)");
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+        // Logic for upgrading schema (if needed in the future)
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS MDTable");
+        onCreate(sqLiteDatabase);
     }
 
-    public boolean insertvalues(String medname,String meddate,String medtime)
-    {
-        SQLiteDatabase database=this.getWritableDatabase();
-        ContentValues contentValues=new ContentValues();
-        contentValues.put("MedicineName",medname);
-        contentValues.put("date",meddate);
-        contentValues.put("time",medtime);
-        long res=database.insert("MDTable",null,contentValues);
-        if(res==-1)
-            return false;
-        else
-            return true;
+    // Method to insert values into the database
+    public boolean insertValues(String medName, String medDate, String medTime) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("MedicineName", medName);
+        contentValues.put("date", medDate);
+        contentValues.put("time", medTime);
+
+        long result = database.insert("MDTable", null, contentValues);
+        database.close(); // Always close database to avoid leaks
+
+        return result != -1; // Returns true if the insert was successful
     }
 
-    public Cursor FetchData(String date,String time)
-    {
-        SQLiteDatabase database=this.getReadableDatabase();
-        Cursor c=database.rawQuery("Select * from MDTable where date='"+date+"' AND time='"+time+"'",null);
-        return c;
+    // Method to fetch data based on date and time
+    public Cursor fetchData(String date, String time) {
+        SQLiteDatabase database = this.getReadableDatabase();
+
+        // Use parameterized query to avoid SQL injection
+        Cursor cursor = database.rawQuery("SELECT * FROM MDTable WHERE date=? AND time=?", new String[]{date, time});
+
+        // We don't close the cursor here because it will be closed by the caller
+        return cursor;
     }
 }
+
+
 
 
 Jatin
